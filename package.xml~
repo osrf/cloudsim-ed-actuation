@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>cloudsim_ed_actuation_gazebo</name>
+  <name>cloudsim-ed-actuation_gazebo</name>
   <version>0.0.0</version>
-  <description>The cloudsim_ed_actuation_gazebo package</description>
+  <description>The cloudsim-ed-actuation_gazebo package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
