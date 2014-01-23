@@ -130,6 +130,12 @@ install(FILES
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+install(PROGRAMS
+  scripts/run_gazebo
+  scripts/run_gzserver
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
+)
+
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
 
