@@ -1,5 +1,0 @@
-
-from IPython.demo import Demo
-
-test=Demo('test.py')
-test()
