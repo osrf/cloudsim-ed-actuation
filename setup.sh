@@ -1,14 +1,16 @@
 #!/bin/bash
 
-echo "Creating directories..."
 . /opt/ros/groovy/setup.bash
+
+echo "Creating directories..."
 mkdir /home/ubuntu/code
+cd /home/ubuntu/code
 mkdir ws
 mkdir ws/src
-cd /home/ubuntu/code/ws/src
+cd ws/src
 
-echo "Cloning repo..."
-hg clone https://bitbucket.org/ammpedro/cloudsim-ed-actuation
+echo "Transfer repo..."
+cp -r ~/cloudsim-ed-actuation /home/ubuntu/code/ws/src
 echo "Initializing catkin workspace"
 catkin_init_workspace
 cd ..
