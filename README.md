@@ -6,4 +6,5 @@ Tested on:
 
 Notes (1/24/2014)
 
-1. Run setup.sh
+1. Clone repo
+2. Run setup.sh
