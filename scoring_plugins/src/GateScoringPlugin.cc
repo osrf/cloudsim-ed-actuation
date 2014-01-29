@@ -147,6 +147,11 @@ void GateScoringPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 ////////////////////////////////////////////////////////////////////////////////
 void GateScoringPlugin::DeferredLoad()
 { 
+
+    std::map<std::string, std::string> m;
+  ros::init(m ,"asf" );
+  
+  //ros::NodeHandle nh;
   // initialize ros
   if (!ros::isInitialized())
   {
@@ -170,7 +175,7 @@ void GateScoringPlugin::DeferredLoad()
   this->turtleBot.reset();
   while (!this->turtleBot)
   {
-    this->turtleBot = this->world->GetModel("mobile_base");
+    this->turtleBot = this->world->GetModel("basic_robot");
     gzwarn << "Waiting for turtlebot" << std::endl;
     sleep(1.0);
     //gzerr << "Failed to find turtlebot" << std::endl;
