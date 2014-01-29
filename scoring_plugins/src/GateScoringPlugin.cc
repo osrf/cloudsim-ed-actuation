@@ -169,7 +169,7 @@ void GateScoringPlugin::DeferredLoad()
 
   this->pubScoreQueue = this->pmq->addPub<scoring_plugins::Score>();
   this->pubScore = this->rosNode->advertise<scoring_plugins::Score>(
-    "gate_score", 1, true);
+    "vrc_score", 1, true);
 
 // Everybody needs TurtleBot.
   this->turtleBot.reset();
