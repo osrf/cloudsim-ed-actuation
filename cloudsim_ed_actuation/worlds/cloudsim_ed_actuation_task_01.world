@@ -30,6 +30,5 @@
       <score_file>/tmp/gate/score.log</score_file>
     </plugin>
     
-
   </world>
 </sdf>

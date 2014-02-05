@@ -81,7 +81,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES cloudsim_ed_actuation
+#  LIBRARIES cloudsim-ed-actuation_gazebo
 #  CATKIN_DEPENDS roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
@@ -135,11 +135,6 @@ install(PROGRAMS
   scripts/run_gzserver
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/scripts
 )
-
-install(FILES
-  notebooks/Task_01-01.ipynb
-  DESTINATION ~/cloudsim/notebook
-) 
 
 # all install targets should use catkin DESTINATION variables
 # See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html

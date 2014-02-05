@@ -121,6 +121,6 @@
   </plugin>
 -->
 
-  <plugin name="battery_model" filename="libbattery_model.so"/>
+  <plugin name="battery_plugin" filename="libbattery_plugin.so"/>
    </model>
 </sdf>
