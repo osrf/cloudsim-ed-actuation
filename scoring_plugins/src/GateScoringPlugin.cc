@@ -148,8 +148,8 @@ void GateScoringPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 void GateScoringPlugin::DeferredLoad()
 { 
 
-    std::map<std::string, std::string> m;
-  ros::init(m ,"asf" );
+  std::map<std::string, std::string> m;
+  ros::init(m ,"actuation" );
   
   //ros::NodeHandle nh;
   // initialize ros

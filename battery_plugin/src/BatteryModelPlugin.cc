@@ -17,7 +17,7 @@
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "/home/ana/Dropbox/workspace/catkin_ws/src/cloudsim_ed_actuation_gazebo/battery_plugin/include/battery_plugin/BatteryModelPlugin.hh"
+#include "BatteryModelPlugin.hh"
 
 using namespace gazebo;
 
