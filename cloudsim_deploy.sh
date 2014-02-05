@@ -2,9 +2,11 @@
 
 . /opt/ros/groovy/setup.bash
 
+#delete all first
+
 echo "Creating directories..."
-mkdir /home/ubuntu/code
-cd /home/ubuntu/code
+mkdir ~/code
+cd ~/code
 mkdir ws
 mkdir ws/src
 cd ws/src
@@ -17,12 +19,13 @@ cd ..
 
 echo "Building catkin workspace"
 catkin_make install
-source devel/setup.bash
+. devel/setup.bash
 . install/setup.bash
 . install/share/cloudsim_ed_actuation/setup.sh
 
-echo "Setup Notebooks"
-cp src/cloudsim-ed-actuation/notebooks/. /home/ubuntu/cloudsim/notebook/ -R
+# /home/ubuntu/cloudsim/notebook/
+#echo "Setup Notebooks"
+#cp src/cloudsim-ed-actuation/notebooks/. /home/ubuntu/cloudsim/notebook/ -R
 
 echo "Delete repo files"
 rm -r ~/cloudsim-ed-actuation
