@@ -2,7 +2,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # source ros
-. /opt/ros/groovy/setup.bash
+. /opt/ros/$ROS_DISTRO/setup.bash
 
 # source the project specific stuff (models, plugins)
 . $DIR/../../install/setup.bash

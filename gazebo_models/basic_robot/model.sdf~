@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
-<model name="my_robot">
+  <model name="my_robot">
 <static>false</static>
      <link name='chassis'>
       <pose>0 0 .1 0 0 0</pose>
@@ -96,6 +96,7 @@
       <xyz>0 1 0</xyz>
     </axis>
   </joint>
+
   <joint type="revolute" name="right_wheel_hinge">
     <pose>0 0 0.03 0 0 0</pose>
     <child>right_wheel</child>
@@ -105,22 +106,17 @@
     </axis>
   </joint>
 
- <!-- 
-    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>${update_rate}</updateRate>
-        <leftJoint>right_wheel_hinge</leftJoint>
-        <rightJoint>left_wheel_hinge</rightJoint>
-        <wheelSeparation>0.2</wheelSeparation>
-        <wheelDiameter>0.1</wheelDiameter>
-        <torque>1.5</torque>
-        <commandTopic>cmd_vel</commandTopic>
-        <odometryTopic>odom</odometryTopic>
-        <odometryFrame>odom</odometryFrame>
-        <robotBaseFrame>base_footprint</robotBaseFrame>
-  </plugin>
--->
+   <plugin name="battery_plugin" filename="libBatteryModelPlugin.so">
+    <battery_file> </battery_file>
+    
+    <left_wheel> left_wheel_hinge </left_wheel>
+    <right_wheel> right_wheel_hinge </right_wheel>
+    <torque> 10 </torque>
+    <rated_capacity> 6.5 </rated_capacity>    
+    <initial_charge> 100 </initial_charge>
+    <nominal_voltage> 12 </nominal_voltage>
+    
+   </plugin>
 
-  <plugin name="battery_plugin" filename="libbattery_plugin.so"/>
    </model>
 </sdf>
