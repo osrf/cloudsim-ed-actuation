@@ -38,6 +38,10 @@ namespace gazebo
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
 
+    /// \brief: thread out Load function with
+    /// with anything that might be blocking.
+    private: void DeferredLoad();
+
     private: void OnUpdate();
 
     private: void OnPoseTrajectoryMsg(ConstPoseTrajectoryPtr &_msg);
@@ -98,6 +102,10 @@ namespace gazebo
 
     /// \brief ros node handle
     private: ros::NodeHandle *rosNode;
+
+    // ros publish multi queue, prevents publish() blocking
+    private: PubMultiQueue* pmq;
+    private: boost::thread deferredLoadThread;
 
     private: event::ConnectionPtr updateConnection;
 

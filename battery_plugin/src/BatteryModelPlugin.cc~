@@ -38,7 +38,7 @@ GZ_REGISTER_MODEL_PLUGIN(BatteryModelPlugin)
 /////////////////////////////////////////////////
 BatteryModelPlugin::BatteryModelPlugin()
 {
-        gzwarn << "asdf\n";
+        gzwarn << "Created BatteryModelPlugin\n";
 }
 
 /////////////////////////////////////////////////
@@ -72,6 +72,7 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
   // set torque value
   if (_sdf->HasElement("torque"))
     this->torque = _sdf->GetElement("torque")->Get<double>();
+
   else
   {
     gzwarn << "No torque value set. (default) Torque = 5.0.\n";
@@ -128,14 +129,14 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
       this->batteryFilePath = boost::filesystem::path(homePath);
 
     this->batteryFilePath /= ".gazebo";
-    this->batteryFilePath /= "scores";
-    this->batteryFilePath /= this->world->GetName() + ".score";
+    this->batteryFilePath /= "battery";
+    this->batteryFilePath /= this->world->GetName() + ".battery";
   }
 
-  // Create the score directory if needed
+  // Create the battery directory if needed
   if (!boost::filesystem::exists(this->batteryFilePath.parent_path()))
     boost::filesystem::create_directories(this->batteryFilePath.parent_path());
-  // Open the score file for writing
+  // Open the battery file for writing
   this->batteryFileStream.open(this->batteryFilePath.string().c_str(),
                              std::fstream::out);
   if (!this->batteryFileStream.is_open())
@@ -163,6 +164,9 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
       this->model->GetName() + "/pose_trajectory",
       &BatteryModelPlugin::OnPoseTrajectoryMsg, this);
 
+  this->deferredLoadThread =
+    boost::thread(boost::bind(&BatteryModelPlugin::DeferredLoad, this));
+
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&BatteryModelPlugin::OnUpdate, this));
 }
@@ -185,6 +189,35 @@ void BatteryModelPlugin::Init()
 
   // compute
   
+}
+
+/////////////////////////////////////////////////
+void BatteryModelPlugin::DeferredLoad()
+{
+/*
+  std::map<std::string, std::string> m;
+  ros::init(m ,"actuation" );
+  
+  //ros::NodeHandle nh;
+  // initialize ros
+  if (!ros::isInitialized())
+  {
+    gzerr << "Not loading VRC scoring plugin because ROS hasn't been "
+          << "properly initialized.  Try starting gazebo with ros plugin:\n"
+          << "  gazebo -s libgazebo_ros_api_plugin.so\n";
+    return;
+  }
+
+  // ros stuff
+  this->rosNode = new ros::NodeHandle("");
+
+  // publish multi queue
+  this->pmq->startServiceThread();
+
+  this->pubBatteryMsgQueue = this->pmq->addPub<battery_plugin::Battery>();
+  this->pubBatteryMsg = this->rosNode->advertise<battery_plugin::Battery>(
+    "battery_msg", 1, true);
+*/
 }
 
 /////////////////////////////////////////////////
@@ -257,34 +290,30 @@ void BatteryModelPlugin::OnUpdate()
   std::string BatteryMsg = "test";
   bool forceLogBattery = false;  
 
-  // forward until battery depleted
+  this->leftWheel->SetForce(0, leftVelDesired);
+  this->rightWheel->SetForce(0, rightVelDesired);
+  /* forward until battery depleted
   if (this->battCharge > 0.0)
   {
     double leftVelDesired = 0.5;
     double rightVelDesired = 0.5;
 
-    this->leftWheel->SetVelocity(0, leftVelDesired);
-    this->rightWheel->SetVelocity(0, rightVelDesired);
-
-    this->leftWheel->SetMaxForce(0, this->torque);
-    this->rightWheel->SetMaxForce(0, this->torque);
-
-    // temporary, assumed 100% charge; 0.005% per update
-    this->battCharge = this->battCharge - 0.005;
-
-    if (this->battCharge < 50)
-        gzwarn << "Battery: " << this->battCharge  << std::endl;
-  }
-  else
-  {
-    this->leftWheel->SetVelocity(0, 0);
-    this->rightWheel->SetVelocity(0, 0);
-  }
+    this->leftWheel->SetForce(0, leftVelDesired);
+    this->rightWheel->SetForce(0, rightVelDesired);
   
-  //this->leftWheel->SetVelocity(0, 0);
-  //this->rightWheel->SetVelocity(0, 0);
+  }
+*/  
 
+
+  // temporary, assumed 100% charge; 0.005% per update
+  this->battCharge = this->battCharge - 0.005;
 
   // write battery status messages. null pointer issues 
-  //this->WriteBatteryState(simTime, wallTime, BatteryMsg, forceLogBattery);
+  if (!fmod(simTime.Double(), 1000))
+  {
+    gzwarn << "Battery: " << this->battCharge  << std::endl;    
+    //this->WriteBatteryState(simTime, wallTime, BatteryMsg, forceLogBattery);
+  }
+
+
 }

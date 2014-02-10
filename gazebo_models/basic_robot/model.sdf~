@@ -107,16 +107,47 @@
   </joint>
 
    <plugin name="battery_plugin" filename="libBatteryModelPlugin.so">
-    <battery_file> </battery_file>
+    <battery_file>/tmp/gate/battery.log</battery_file>
+
+    <topicName> basic_robot/battery </topicName>
+    <commandTopic> basic_robot/move_cmd </commandTopic>
     
     <left_wheel> left_wheel_hinge </left_wheel>
     <right_wheel> right_wheel_hinge </right_wheel>
     <torque> 10 </torque>
     <rated_capacity> 6.5 </rated_capacity>    
     <initial_charge> 100 </initial_charge>
-    <nominal_voltage> 12 </nominal_voltage>
-    
+    <nominal_voltage> 12 </nominal_voltage>    
    </plugin>
+
+   <plugin name="battery_plugin" filename="libBatteryModelPlugin.so">
+    <battery_file>/tmp/gate/battery.log</battery_file>
+
+    <topicName> basic_robot/battery </topicName>
+    <commandTopic> basic_robot/move_cmd </commandTopic>
+    
+    <left_wheel> left_wheel_hinge </left_wheel>
+    <right_wheel> right_wheel_hinge </right_wheel>
+    <torque> 10 </torque>
+    <rated_capacity> 6.5 </rated_capacity>    
+    <initial_charge> 100 </initial_charge>
+    <nominal_voltage> 12 </nominal_voltage>    
+   </plugin>
+
+  <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+    <alwaysOn>true</alwaysOn>
+    <updateRate>${update_rate}</updateRate>
+    <leftJoint>left_wheel_hinge</leftJoint>
+    <rightJoint>right_wheel_hinge</rightJoint>
+    <wheelSeparation>0.5380</wheelSeparation>
+    <wheelDiameter>0.2410</wheelDiameter>
+    <torque>20</torque>
+    <commandTopic>cmd_vel</commandTopic>
+    <odometryTopic>odom</odometryTopic>
+    <odometryFrame>odom</odometryFrame>
+    <robotBaseFrame>base_footprint</robotBaseFrame>
+    <robotNamespace>basic_robot</robotNamespace>
+  </plugin>
 
    </model>
 </sdf>

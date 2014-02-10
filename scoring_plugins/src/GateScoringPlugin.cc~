@@ -176,13 +176,13 @@ void GateScoringPlugin::DeferredLoad()
   while (!this->turtleBot)
   {
     this->turtleBot = this->world->GetModel("basic_robot");
-    gzwarn << "Waiting for basic_robot" << std::endl;
+    gzwarn << "Waiting for turtlebot" << std::endl;
     sleep(1.0);
     //gzerr << "Failed to find turtlebot" << std::endl;
     
   }
   this->initialPose = this->turtleBot->GetWorldPose();
-  gzwarn << "Found basic_robot" << std::endl;
+  gzwarn << "Found turtlebot" << std::endl;
 }
 
 /////////////////////////////////////////////////
