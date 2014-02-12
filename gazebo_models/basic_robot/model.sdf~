@@ -106,19 +106,6 @@
     </axis>
   </joint>
 
-   <plugin name="battery_plugin" filename="libBatteryModelPlugin.so">
-    <battery_file>/tmp/gate/battery.log</battery_file>
-
-    <topicName> basic_robot/battery </topicName>
-    <commandTopic> basic_robot/move_cmd </commandTopic>
-    
-    <left_wheel> left_wheel_hinge </left_wheel>
-    <right_wheel> right_wheel_hinge </right_wheel>
-    <torque> 10 </torque>
-    <rated_capacity> 6.5 </rated_capacity>    
-    <initial_charge> 100 </initial_charge>
-    <nominal_voltage> 12 </nominal_voltage>    
-   </plugin>
 
    <plugin name="battery_plugin" filename="libBatteryModelPlugin.so">
     <battery_file>/tmp/gate/battery.log</battery_file>

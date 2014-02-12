@@ -31,6 +31,9 @@
 #include <gazebo/util/util.hh>
 #include <gazebo/physics/physics.hh>
 
+#include <ros/ros.h>
+#include <sstream>
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(BatteryModelPlugin)
@@ -39,6 +42,17 @@ GZ_REGISTER_MODEL_PLUGIN(BatteryModelPlugin)
 BatteryModelPlugin::BatteryModelPlugin()
 {
         gzwarn << "Created BatteryModelPlugin\n";
+
+  this->pmq = new PubMultiQueue();
+  this->rosNode = NULL;
+  this->lastUpdate=0;
+}
+
+/////////////////////////////////////////////////
+BatteryModelPlugin::~BatteryModelPlugin()
+{
+  delete this->pmq;
+  delete this->rosNode;
 }
 
 /////////////////////////////////////////////////
@@ -55,6 +69,11 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
 
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
+
+  this->moveSub = this->node->Subscribe(std::string("~/") +
+      this->model->GetName() + "/move_command",
+      &BatteryModelPlugin::OnMoveCmdMsg, this);
+
 
   // check for left and right wheel
   if (!_sdf->HasElement("left_wheel"))
@@ -111,7 +130,6 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
           << _sdf->GetElement("right_wheel")->Get<std::string>() << "]\n";
 
 
-
   // battery charge messages
   if (_sdf->HasElement("battery_file"))
     this->batteryFilePath =
@@ -160,15 +178,13 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
     "wallTimeElapsed(sec),simTimeElapsed(sec)" << std::endl;
 
 
-  this->trajSub = this->node->Subscribe(std::string("~/") +
-      this->model->GetName() + "/pose_trajectory",
-      &BatteryModelPlugin::OnPoseTrajectoryMsg, this);
-
   this->deferredLoadThread =
     boost::thread(boost::bind(&BatteryModelPlugin::DeferredLoad, this));
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
           boost::bind(&BatteryModelPlugin::OnUpdate, this));
+
+
 }
 
 /////////////////////////////////////////////////
@@ -187,26 +203,36 @@ void BatteryModelPlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.GetSize().GetMax() * 0.5;
 
-  // compute
+  // compute discharge current for NiMH type
+  this->nominalDischargeCurrent = 0.2 * this->ratedCapacity;
+
+  // multipliers
+  // motor load < specs (slower discharge)
+
+  // motor load == specs (normal discharge)
+
+  // motor load > specs (faster discharge)
+
   
 }
 
 /////////////////////////////////////////////////
 void BatteryModelPlugin::DeferredLoad()
 {
-/*
-  std::map<std::string, std::string> m;
-  ros::init(m ,"actuation" );
-  
-  //ros::NodeHandle nh;
+
+  //std::map<std::string, std::string> m;
+  //ros::init(m ,"actuation" );
+    //ros::NodeHandle nh;
   // initialize ros
   if (!ros::isInitialized())
   {
+    sleep(50);
     gzerr << "Not loading VRC scoring plugin because ROS hasn't been "
           << "properly initialized.  Try starting gazebo with ros plugin:\n"
           << "  gazebo -s libgazebo_ros_api_plugin.so\n";
     return;
   }
+
 
   // ros stuff
   this->rosNode = new ros::NodeHandle("");
@@ -217,12 +243,12 @@ void BatteryModelPlugin::DeferredLoad()
   this->pubBatteryMsgQueue = this->pmq->addPub<battery_plugin::Battery>();
   this->pubBatteryMsg = this->rosNode->advertise<battery_plugin::Battery>(
     "battery_msg", 1, true);
-*/
+
 }
 
 /////////////////////////////////////////////////
 void BatteryModelPlugin::WriteBatteryState(const common::Time &_simTime,
-  const common::Time &_wallTime, const std::string &_msg, bool _force)
+  const common::Time &_wallTime, bool _force)
 {
   // Write at 1Hz
   if (!_force && (_simTime - this->prevBatteryTime).Double() < 1.0)
@@ -243,31 +269,21 @@ void BatteryModelPlugin::WriteBatteryState(const common::Time &_simTime,
     return;
   }
 
-    common::Time elapsedTimeWall;
-    if (this->stopTimeWall != common::Time::Zero)
-      elapsedTimeWall = stopTimeWall - startTimeWall;
-    else if (this->startTimeWall != common::Time::Zero)
-      elapsedTimeWall = _wallTime - this->startTimeWall;
-
-    common::Time runElapsedTimeWall = _wallTime - this->runStartTimeWall;
+  common::Time runElapsedTimeWall = _wallTime - this->runStartTimeWall;
 
   // Output message in json format
   this->batteryFileStream << std::fixed << std::setprecision(3)
     << "{"
     << "\"wall_time\": " << runElapsedTimeWall.Double() << ", "
     << "\"sim_time\": " << _simTime.Double() << ", "
-    << "\"wall_time_elapsed\": " << elapsedTimeWall.Double() << ", "
-    << "\"sim_time_elapsed\": " << elapsedTimeSim.Double() << ", "
-    << "\"message\": \"" << _msg << "\""
+    << "\"charge\": \"" << this->battCharge << "\""
     << "}" << std::endl;
 
   // Also publish via ROS
   battery_plugin::Battery rosBatteryMsg;
   rosBatteryMsg.wall_time = ros::Time(runElapsedTimeWall.Double());
   rosBatteryMsg.sim_time = ros::Time(_simTime.Double());
-  rosBatteryMsg.wall_time_elapsed = ros::Time(elapsedTimeWall.Double());
-  rosBatteryMsg.sim_time_elapsed = ros::Time(elapsedTimeSim.Double());
-  rosBatteryMsg.message = _msg;
+  rosBatteryMsg.current_batt_charge = this->battCharge;
 
   this->pubBatteryMsgQueue->push(rosBatteryMsg, this->pubBatteryMsg);
 
@@ -276,9 +292,10 @@ void BatteryModelPlugin::WriteBatteryState(const common::Time &_simTime,
 }
 
 /////////////////////////////////////////////////
-void BatteryModelPlugin::OnPoseTrajectoryMsg(
-    ConstPoseTrajectoryPtr &/*_msg*/)
+void BatteryModelPlugin::OnMoveCmdMsg(
+ConstPosePtr &_msg)
 {
+    gzwarn << "Command Message Received" << std::endl;
 }
 
 /////////////////////////////////////////////////
@@ -287,33 +304,22 @@ void BatteryModelPlugin::OnUpdate()
   common::Time simTime =  this->model->GetWorld()->GetSimTime();
   common::Time wallTime = common::Time::GetWallTime();
 
-  std::string BatteryMsg = "test";
   bool forceLogBattery = false;  
-
-  this->leftWheel->SetForce(0, leftVelDesired);
-  this->rightWheel->SetForce(0, rightVelDesired);
-  /* forward until battery depleted
-  if (this->battCharge > 0.0)
-  {
-    double leftVelDesired = 0.5;
-    double rightVelDesired = 0.5;
-
-    this->leftWheel->SetForce(0, leftVelDesired);
-    this->rightWheel->SetForce(0, rightVelDesired);
-  
-  }
-*/  
-
 
   // temporary, assumed 100% charge; 0.005% per update
   this->battCharge = this->battCharge - 0.005;
 
-  // write battery status messages. null pointer issues 
-  if (!fmod(simTime.Double(), 1000))
+  // write battery status messages per 10 simtime units
+  if (!fmod(simTime.Double(),10))
   {
     gzwarn << "Battery: " << this->battCharge  << std::endl;    
-    //this->WriteBatteryState(simTime, wallTime, BatteryMsg, forceLogBattery);
-  }
+    gzwarn << "SimTime: " << simTime.Double()  << std::endl;   
+ 
+    // temporary, assumed 100% charge; 0.278% per 10 seconds
+    this->battCharge = this->battCharge - 0.278;
 
+    this->WriteBatteryState(simTime, wallTime, forceLogBattery);
+    lastUpdate = simTime.Double();
+  }
 
 }

@@ -37,6 +37,7 @@ namespace gazebo
     public: BatteryModelPlugin();
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
     public: virtual void Init();
+    public: virtual  ~BatteryModelPlugin();
 
     /// \brief: thread out Load function with
     /// with anything that might be blocking.
@@ -44,15 +45,16 @@ namespace gazebo
 
     private: void OnUpdate();
 
-    private: void OnMoveCmdMsg(ConstMoveCmdPtr &_msg);
+    private: void OnMoveCmdMsg(ConstPosePtr &_msg);
 
     private: void WriteBatteryState(const common::Time &_simTime,
-                                    const common::Time &_wallTime, 
-                                    const std::string &_msg, 
+                                    const common::Time &_wallTime,
                                     bool _force);
 
+    private: double lastUpdate;
+
     private: transport::NodePtr node;
-    private: transport::SubscriberPtr velSub;
+    private: transport::SubscriberPtr moveSub;
     private: physics::JointPtr leftWheel, rightWheel;
     private: double wheelSpeed[2];
     private: double torque;
@@ -64,18 +66,10 @@ namespace gazebo
     private: double ratedCapacity;      // Ah  
     private: double battCapacity;      // Ah  
     private: double nominalVoltage;     // V
+    private: double nominaDischargeCurrent; // A
 
     /// \brief The absolute wall time when the run started
     private: common::Time runStartTimeWall;
-
-    /// \brief Sim time at which TurtleBot passed through the first gate.
-    private: gazebo::common::Time startTimeSim;
-
-    /// \brief Wall time at which TurtleBot passed through the first gate.
-    private: gazebo::common::Time startTimeWall;
-
-    /// \brief Sim time at which TurtleBot achieved the last checkpoint.
-    private: gazebo::common::Time stopTimeSim;
 
     /// \brief Wall time at which TurtleBot achieved the last checkpoint.
     private: gazebo::common::Time stopTimeWall;

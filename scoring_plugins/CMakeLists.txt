@@ -53,7 +53,7 @@ link_directories(
 
 add_library(GateScoringPlugin src/GateScoringPlugin.cc)
 target_link_libraries(GateScoringPlugin ${catkin_LIBRARIES})
-#add_dependencies(GateScoringPlugin atlas_msgs_gencpp)
+add_dependencies(GateScoringPlugin scoring_plugins_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 
 ### executables, utilities for debugging atlas simulation, should not depend on gazebo
