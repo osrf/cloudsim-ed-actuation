@@ -126,15 +126,15 @@
     <rated_capacity> 6.5 </rated_capacity>    
     <initial_charge> 100 </initial_charge>
     <nominal_voltage> 12 </nominal_voltage>    
-
 <<<<<<< local
+
     <commandTopic>vel_cmd</commandTopic>
     <odometryTopic>odom</odometryTopic>
     <odometryFrame>odom</odometryFrame>
     <robotBaseFrame>chassis</robotBaseFrame>
+    
 =======
 >>>>>>> other
-    
    </plugin>
 
 <<<<<<< local

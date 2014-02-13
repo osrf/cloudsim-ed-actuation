@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(scoring_plugins)
+project(battery_plugin)
 set(CMAKE_BUILD_TYPE "RelWithDebInfo")
 
 
@@ -8,12 +8,13 @@ find_package(catkin REQUIRED COMPONENTS
              std_msgs
              gazebo_plugins
              message_generation
+             scoring_plugins
 )
 
 add_message_files(
   DIRECTORY msg
   FILES
-  Score.msg
+  Battery.msg
   )
 
 generate_messages(DEPENDENCIES
@@ -51,9 +52,9 @@ link_directories(
 ## Declare a cpp library
 
 
-add_library(GateScoringPlugin src/GateScoringPlugin.cc)
-target_link_libraries(GateScoringPlugin ${catkin_LIBRARIES})
-add_dependencies(GateScoringPlugin scoring_plugins_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
+add_library(BatteryModelPlugin src/BatteryModelPlugin.cc)
+target_link_libraries(BatteryModelPlugin ${catkin_LIBRARIES})
+add_dependencies(BatteryModelPlugin battery_plugin_generate_messages_cpp ${catkin_EXPORTED_TARGETS})
 
 
 ### executables, utilities for debugging atlas simulation, should not depend on gazebo
@@ -62,7 +63,7 @@ add_dependencies(GateScoringPlugin scoring_plugins_generate_messages_cpp ${catki
 #############
 ## Install ##
 #############
-install(TARGETS GateScoringPlugin 
+install(TARGETS BatteryModelPlugin 
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 

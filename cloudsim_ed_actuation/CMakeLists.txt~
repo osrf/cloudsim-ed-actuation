@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cloudsim_ed_actuation_gazebo)
+project(cloudsim_ed_actuation)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -161,11 +161,11 @@ install(PROGRAMS
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
+ install(FILES
+   ~/src/cloudsim-ed-actuation/setup.bash
 #   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+ )
 
 #############
 ## Testing ##
