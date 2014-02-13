@@ -46,6 +46,11 @@ BatteryModelPlugin::BatteryModelPlugin()
   this->pmq = new PubMultiQueue();
   this->rosNode = NULL;
   this->lastUpdate=0;
+<<<<<<< local
+
+
+=======
+>>>>>>> other
 }
 
 /////////////////////////////////////////////////
@@ -70,11 +75,21 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(this->model->GetWorld()->GetName());
 
+<<<<<<< local
+  // ros stuff
+  this->rosNode = new ros::NodeHandle("");
+=======
   this->moveSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/move_command",
       &BatteryModelPlugin::OnMoveCmdMsg, this);
+>>>>>>> other
 
 
+<<<<<<< local
+  this->velSub = this->node->Subscribe("~/vel_cmd", &BatteryModelPlugin::OnVelMsg, this);
+
+=======
+>>>>>>> other
   // check for left and right wheel
   if (!_sdf->HasElement("left_wheel"))
     gzerr << "BatteryModel plugin missing <left_wheel> element in SDF file\n";
@@ -177,6 +192,18 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
   this->batteryFileStream << "# wallTime(sec),simTime(sec),"
     "wallTimeElapsed(sec),simTimeElapsed(sec)" << std::endl;
 
+<<<<<<< local
+    //ros::SubscribeOptions so =
+    //  ros::SubscribeOptions::create<geometry_msgs::Twist>("Test", 1,
+    //      boost::bind(&BatteryModelPlugin::cmdVelCallback, this, _1)
+       //   ros::VoidPtr(), &queue_);
+
+    cmd_vel_subscriber_ = this->rosNode->subscribe<geometry_msgs::Twist>("Test", 1, boost::bind(&BatteryModelPlugin::cmdVelCallback, this, _1));
+
+    cmd_vel_throttle_publisher_ = rosNode->advertise<geometry_msgs::Twist>("/wmr/cmd_vel", 1);
+
+=======
+>>>>>>> other
 
   this->deferredLoadThread =
     boost::thread(boost::bind(&BatteryModelPlugin::DeferredLoad, this));
@@ -188,6 +215,31 @@ void BatteryModelPlugin::Load(physics::ModelPtr _model,
 }
 
 /////////////////////////////////////////////////
+<<<<<<< local
+
+void BatteryModelPlugin::cmdVelCallback(
+      const geometry_msgs::Twist::ConstPtr& cmd_msg) 
+{
+
+    gzwarn << "Publish throttle to diff drive here" << std::endl;
+
+    //add twist publisher
+    geometry_msgs::Twist cmd = *cmd_msg;
+    
+
+    // build message
+
+    // pub message
+    cmd_vel_throttle_publisher_.publish(cmd);
+
+    //boost::mutex::scoped_lock scoped_lock(lock);
+    //x_ = cmd_msg->linear.x;
+    //rot_ = cmd_msg->angular.z;
+  }
+
+/////////////////////////////////////////////////
+=======
+>>>>>>> other
 void BatteryModelPlugin::Init()
 {
   gzwarn << "In Init()\n";
@@ -206,6 +258,12 @@ void BatteryModelPlugin::Init()
   // compute discharge current for NiMH type
   this->nominalDischargeCurrent = 0.2 * this->ratedCapacity;
 
+<<<<<<< local
+  // compute % discharge
+  
+
+=======
+>>>>>>> other
   // multipliers
   // motor load < specs (slower discharge)
 
@@ -233,10 +291,13 @@ void BatteryModelPlugin::DeferredLoad()
     return;
   }
 
+<<<<<<< local
+=======
 
   // ros stuff
   this->rosNode = new ros::NodeHandle("");
 
+>>>>>>> other
   // publish multi queue
   this->pmq->startServiceThread();
 
@@ -244,6 +305,10 @@ void BatteryModelPlugin::DeferredLoad()
   this->pubBatteryMsg = this->rosNode->advertise<battery_plugin::Battery>(
     "battery_msg", 1, true);
 
+<<<<<<< local
+
+=======
+>>>>>>> other
 }
 
 /////////////////////////////////////////////////
@@ -292,10 +357,20 @@ void BatteryModelPlugin::WriteBatteryState(const common::Time &_simTime,
 }
 
 /////////////////////////////////////////////////
+<<<<<<< local
+void BatteryModelPlugin::OnVelMsg(ConstPosePtr &_msg)
+=======
 void BatteryModelPlugin::OnMoveCmdMsg(
 ConstPosePtr &_msg)
+>>>>>>> other
 {
+<<<<<<< local
+  gzwarn << "Command Message Received" << std::endl;
+
+  std::cout << _msg->DebugString();
+=======
     gzwarn << "Command Message Received" << std::endl;
+>>>>>>> other
 }
 
 /////////////////////////////////////////////////
